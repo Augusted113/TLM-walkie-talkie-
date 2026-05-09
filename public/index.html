@@ -387,7 +387,7 @@
         var delBtn = showDeleteBtns
           ? '<button class="log-del" onclick="doDeleteLog(' + e.id + ')">Delete</button>'
           : '';
-        html += '<div class="log-row" id="logrow-' + e.id + '">'
+        html += '<div class="log-row logrow-' + e.id + '" id="logrow-' + e.id + '-' + (showDeleteBtns ? 'mgr' : 'view') + '">'
           + '<div class="log-icon">' + (e.action === 'checkout' ? '&#8593;' : '&#8595;') + '</div>'
           + '<div class="log-body"><div class="log-main">'
           + '<span class="log-unit">#' + e.unit + '</span> '
@@ -451,15 +451,16 @@
   }
 
   function doDeleteLog(id) {
-    api('DELETE', '/api/logs/' + id, { password: adminPw }).then(function(r) {
+    api('POST', '/api/logs/' + id + '/delete', { password: adminPw }).then(function(r) {
       if (r.ok) {
-        var row = document.getElementById('logrow-' + id);
-        if (row) row.remove();
-        // Also remove from view-only log tab if present
-        var row2 = document.getElementById('logrow-' + id);
-        if (row2) row2.remove();
+        // Remove from both log containers (both have logrow-{id})
+        document.querySelectorAll('.logrow-' + id).forEach(function(el) { el.remove(); });
         toast('Log entry removed \u2713');
-      } else toast(r.error, 'err');
+      } else {
+        toast(r.error || 'Delete failed', 'err');
+      }
+    }).catch(function() {
+      toast('Request failed', 'err');
     });
   }
 
