@@ -99,3 +99,4 @@ app.delete('/api/logs', (req, res) => {
 });
 
 app.listen(PORT, () => console.log(`Walkie Tracker running on http://localhost:${PORT}`));
+    
