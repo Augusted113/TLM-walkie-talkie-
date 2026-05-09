@@ -10,7 +10,7 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
 // ── In-memory state ──────────────────────────────────────────────────────────
-let units = {WT01,WT02,WT03,WT04,WT05};
+let units = {};
 let logs  = [];
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
