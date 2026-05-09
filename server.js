@@ -15,9 +15,10 @@ let logs  = [];
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 function addLog(action, unit, name, shift) {
-  const cutoff = Date.now() - 48 * 60 * 60 * 1000;
+  const now    = Date.now();
+  const cutoff = now - 48 * 60 * 60 * 1000;
   logs = logs.filter(l => l.timestamp > cutoff);
-  logs.unshift({ id: Date.now(), timestamp: Date.now(), action, unit, name: name || null, shift: shift || null });
+  logs.unshift({ id: now, timestamp: now, action, unit, name: name || null, shift: shift || null });
 }
 
 function checkPassword(req, res) {
@@ -91,7 +92,17 @@ app.post('/api/return/:number', (req, res) => {
   res.json({ ok: true });
 });
 
-// Clear logs — password required
+// Delete a single log entry — password required
+app.post('/api/logs/:id/delete', (req, res) => {
+  if (!checkPassword(req, res)) return;
+  const id = Number(req.params.id);
+  const before = logs.length;
+  logs = logs.filter(l => l.id !== id);
+  if (logs.length === before) return res.status(404).json({ error: 'Log entry not found.' });
+  res.json({ ok: true });
+});
+
+// Clear all logs — password required
 app.delete('/api/logs', (req, res) => {
   if (!checkPassword(req, res)) return;
   logs = [];
@@ -99,4 +110,3 @@ app.delete('/api/logs', (req, res) => {
 });
 
 app.listen(PORT, () => console.log(`Walkie Tracker running on http://localhost:${PORT}`));
-    
